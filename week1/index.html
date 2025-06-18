@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 - Foundation & Orientation | Denton PD Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        .topic-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .topic-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            border-color: var(--secondary-blue);
+        }
+        
+        .topic-icon {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-8 shadow-lg">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <img src="../assets/DPD email logo.png" alt="Denton PD Logo" class="w-16 h-16 mr-6">
+                    <div>
+                        <h1 class="text-3xl font-bold">Week 1: Foundation & Orientation</h1>
+                        <p class="text-blue-100 text-lg">Essential Topics for New Recruits</p>
+                    </div>
+                </div>
+                <nav>
+                    <a href="../denton-pd-academy.html" class="bg-blue-700 hover:bg-blue-600 px-6 py-3 rounded-lg transition font-medium">
+                        ← Academy Home
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Week Overview -->
+    <section class="py-12">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Week 1 Overview</h2>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    The first week of training establishes the foundation for your career in law enforcement. 
+                    You'll learn essential skills, procedures, and mindset required for professional policing.
+                </p>
+            </div>
+
+            <!-- Week Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <div class="text-3xl font-bold text-blue-600">8</div>
+                    <div class="text-gray-600">Topics</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <div class="text-3xl font-bold text-blue-600">40</div>
+                    <div class="text-gray-600">Hours</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <div class="text-3xl font-bold text-blue-600">5</div>
+                    <div class="text-gray-600">Days</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <div class="text-3xl font-bold text-blue-600">100%</div>
+                    <div class="text-gray-600">Attendance</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Topics Grid -->
+    <main class="container mx-auto px-6 pb-12">
+        <div class="max-w-6xl mx-auto">
+            <h3 class="text-2xl font-bold text-gray-800 mb-8 text-center">Week 1 Topics</h3>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Penal Code -->
+                <a href="penal-code.html" class="topic-card bg-white rounded-xl p-6 shadow-lg block">
+                    <div class="flex items-center mb-4">
+                        <div class="topic-icon w-12 h-12 rounded-lg flex items-center justify-center text-white mr-4">
+                            ⚖️
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800">Penal Code</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">Foundation of Texas criminal law and essential legal terminology for law enforcement.</p>
+                    <div class="flex items-center text-sm text-blue-600">
+                        <span>Start Learning</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Radio Communications -->
+                <a href="radio-communications.html" class="topic-card bg-white rounded-xl p-6 shadow-lg block">
+                    <div class="flex items-center mb-4">
+                        <div class="topic-icon w-12 h-12 rounded-lg flex items-center justify-center text-white mr-4">
+                            📻
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800">Radio Communications</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">Professional radio procedures, codes, and emergency communication protocols.</p>
+                    <div class="flex items-center text-sm text-blue-600">
+                        <span>Start Learning</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Civilian Interactions -->
+                <a href="civilian-interactions.html" class="topic-card bg-white rounded-xl p-6 shadow-lg block">
+                    <div class="flex items-center mb-4">
+                        <div class="topic-icon w-12 h-12 rounded-lg flex items-center justify-center text-white mr-4">
+                            🤝
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800">Civilian Interactions</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">Professional communication and de-escalation techniques for public interactions.</p>
+                    <div class="flex items-center text-sm text-blue-600">
+                        <span>Start Learning</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Fitness and Wellness -->
+                <a href="fitness-wellness.html" class="topic-card bg-white rounded-xl p-6 shadow-lg block">
+                    <div class="flex items-center mb-4">
+                        <div class="topic-icon w-12 h-12 rounded-lg flex items-center justify-center text-white mr-4">
+                            💪
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800">Fitness and Wellness</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">Physical fitness standards, mental health, and officer wellness programs.</p>
+                    <div class="flex items-center text-sm text-blue-600">
+                        <span>Start Learning</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- CCP and Constitution -->
+                <a href="ccp-constitution.html" class="topic-card bg-white rounded-xl p-6 shadow-lg block">
+                    <div class="flex items-center mb-4">
+                        <div class="topic-icon w-12 h-12 rounded-lg flex items-center justify-center text-white mr-4">
+                            📜
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800">CCP and Constitution</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">Code of Criminal Procedure and constitutional rights in law enforcement.</p>
+                    <div class="flex items-center text-sm text-blue-600">
+                        <span>Start Learning</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Arrest & Frisk Tactics -->
+                <a href="arrest-frisk-tactics.html" class="topic-card bg-white rounded-xl p-6 shadow-lg block">
+                    <div class="flex items-center mb-4">
+                        <div class="topic-icon w-12 h-12 rounded-lg flex items-center justify-center text-white mr-4">
+                            👮
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800">Arrest & Frisk Tactics</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">Safe and legal procedures for arrests, searches, and suspect control.</p>
+                    <div class="flex items-center text-sm text-blue-600">
+                        <span>Start Learning</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Police Mindset -->
+                <a href="police-mindset.html" class="topic-card bg-white rounded-xl p-6 shadow-lg block">
+                    <div class="flex items-center mb-4">
+                        <div class="topic-icon w-12 h-12 rounded-lg flex items-center justify-center text-white mr-4">
+                            🧠
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800">Police Mindset</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">Developing the professional mindset and ethical standards of law enforcement.</p>
+                    <div class="flex items-center text-sm text-blue-600">
+                        <span>Start Learning</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Portable Radio RSM -->
+                <a href="portable-radio-rsm.html" class="topic-card bg-white rounded-xl p-6 shadow-lg block">
+                    <div class="flex items-center mb-4">
+                        <div class="topic-icon w-12 h-12 rounded-lg flex items-center justify-center text-white mr-4">
+                            🎙️
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800">Portable Radio RSM</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">Operation and maintenance of portable radios and Remote Speaker Microphones.</p>
+                    <div class="flex items-center text-sm text-blue-600">
+                        <span>Start Learning</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <img src="../assets/DPD email logo.png" alt="Denton PD Logo" class="w-8 h-8 mr-3 opacity-80">
+                <span class="text-lg font-semibold">Denton Police Department Academy</span>
+            </div>
+            <p class="text-gray-400">&copy; 2025 Denton Police Department. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1: Interactive Texas Penal Code Study Guide - Denton PD Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Refined Ivory & Blue -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFCF9; /* Refined Ivory */
+            color: #3D3D3D;
+        }
+        :root {
+            --primary-bg: #FDFCF9;
+            --secondary-bg: #F4F1ED;
+            --accent-bg: #E8E6E1;
+            --primary-text: #3D3D3D;
+            --accent-color: #3A5FCD; /* Richer Blue */
+            --accent-hover: #2F4FAD;
+            --academy-blue: #1e3a8a;
+            --academy-light-blue: #3b82f6;
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .nav-link.active {
+            background-color: var(--accent-bg);
+            border-left-color: var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        .nav-link:hover {
+             background-color: var(--accent-bg);
+             color: var(--accent-color);
+        }
+        .flashcard-container {
+            perspective: 1000px;
+            height: 200px; /* Fixed height for consistency */
+        }
+        .flashcard {
+            transition: transform 0.6s ease-in-out, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .flashcard:hover {
+             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+             transform: translateY(-2px);
+        }
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard:hover.is-flipped {
+            transform: rotateY(180deg) translateY(-2px);
+        }
+        .flashcard-face {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .flashcard-front {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid #e2e8f0;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+            border: 2px solid var(--accent-hover);
+        }
+        .flashcard-term {
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--primary-text);
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        .flashcard-definition {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: white;
+            text-align: center;
+            word-break: break-word;
+            overflow-y: auto;
+            max-height: 100%;
+        }
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .flashcard-container {
+                height: 180px;
+            }
+            .flashcard-term {
+                font-size: 1rem;
+            }
+            .flashcard-definition {
+                font-size: 0.85rem;
+            }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 bg-white shadow-sm border-b z-40">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="../assets/DPD email logo.png" alt="Denton PD Logo" class="w-8 h-8">
+                    <a href="../denton-pd-academy.html" class="text-blue-600 hover:text-blue-800 font-medium">← Back to Academy Home</a>
+                </div>
+                <div class="text-sm text-gray-600">
+                    Week 1 of 21 | Topic: Penal Code
+                </div>
+            </div>        </div>
+    </nav>
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden md:hidden"></div>
+    
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-64 bg-[#F4F1ED] p-5 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-20 shadow-lg md:shadow-none border-r border-gray-200 mt-20 md:mt-0">
+        <div class="flex items-center space-x-2 mb-8">
+             <span class="text-2xl">⚖️</span>
+             <h1 class="text-xl font-bold text-[var(--accent-color)]">Penal Code Guide</h1>
+        </div>
+        <nav id="nav-menu" class="space-y-2">
+            <!-- Nav links will be injected here by JS -->
+        </nav>
+    </aside>
+
+    <!-- Mobile Navigation Button -->
+    <button id="mobile-menu-btn" class="md:hidden fixed top-20 left-4 z-30 bg-[#F4F1ED] p-2 rounded-md shadow-lg">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+    </button>
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-10 overflow-y-auto mt-20 md:mt-0">
+        <!-- Content will be injected here by JS -->
+    </main>
+
+<script>
+    const AppData = {
+        sections: [
+            {
+                id: 'foundations',
+                title: 'Foundational Principles',
+                icon: '🏛️',
+                content: () => `
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-[var(--accent-color)]">Part I: Foundational Legal Principles</h2>
+                    <p class="mb-8 text-lg text-gray-600 leading-relaxed">This section clarifies the fundamental distinction between the two major branches of the American legal system: Civil Law and Criminal Law. Understanding their separate purposes, processes, and outcomes is essential for comprehending the scope and function of the Penal Code.</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-[var(--accent-color)]">
+                            <h3 class="text-2xl font-bold mb-3 flex items-center">🤝 Civil Law</h3>
+                            <ul class="space-y-4 text-gray-700">
+                                <li><strong>Focus:</strong> Deals with the rights of individuals to seek a remedy (redress) for a private wrong or injury.</li>
+                                <li><strong>Nature of Wrong:</strong> Called a "tort." Examples include slander, libel, and contract disputes like unpaid rent.</li>
+                                <li><strong>Initiation:</strong> Any individual can sue another for any reason. The process starts with a civil complaint.</li>
+                                <li><strong>Outcome:</strong> Typically seeks monetary damages or a court order (injunction).</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-500">
+                            <h3 class="text-2xl font-bold mb-3 flex items-center">⚖️ Criminal Law</h3>
+                            <ul class="space-y-4 text-gray-700">
+                                <li><strong>Focus:</strong> Established to prevent harm to society as a whole.</li>
+                                <li><strong>Nature of Wrong:</strong> Called an "offense." Involves conduct declared criminal by law.</li>
+                                <li><strong>Codification:</strong> Laws are written down into a Penal Code. Examples include murder, theft, and assault.</li>
+                                <li><strong>Key Relationship:</strong> A criminal case has no legal bearing on a civil case. A person can be acquitted criminally but found liable civilly (e.g., O.J. Simpson case).</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'terminology',
+                title: 'Essential Terminology',
+                icon: '📚',
+                content: () => `
+                    <div class="max-w-7xl mx-auto">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-[var(--accent-color)] text-center">Part II: Essential Legal Terminology</h2>
+                        <p class="mb-8 text-lg text-gray-600 leading-relaxed text-center max-w-4xl mx-auto">Mastering legal terminology is crucial for understanding the Penal Code. This interactive flashcard deck helps you learn key terms through active recall. Click any card to reveal its definition.</p>
+                        
+                        <div class="mb-8 max-w-md mx-auto">
+                            <div class="relative">
+                                <input type="text" id="flashcard-search" placeholder="Search for a term..." 
+                                       class="w-full p-4 pl-12 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)] focus:outline-none transition-all duration-200 text-lg">
+                                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 text-center">💡 Tip: Click cards to flip them and reveal definitions</p>
+                        </div>
+                        
+                        <div id="flashcard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        </div>
+                        
+                        <div id="search-results" class="text-center mt-8 text-gray-500 hidden">
+                            <p>No terms found matching your search.</p>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    const terms = [
+                        { term: 'Negation', definition: 'The act of making something invalid or denying it. In law, it refers to disproving an element or an exception.' },
+                        { term: 'Imminent', definition: 'About to happen; impending. Implies a split-second, immediate threat that can elevate an offense.' },
+                        { term: 'Preponderance of the Evidence', definition: 'The standard of proof in civil cases and for affirmative defenses. It means the claim is more likely true than not (>50%).' },
+                        { term: 'Standing', definition: 'The legal right to make a complaint. The person directly harmed has standing.' },
+                        { term: 'Consanguinity', definition: 'A relationship by blood. Can enhance an offense (e.g., to Assault Family Violence).' },
+                        { term: 'Affinity', definition: 'A relationship by marriage.' },
+                        { term: 'Common Law Marriage', definition: 'Legally recognized in Texas if three conditions are met: living together, sharing money, and one party states they are married or intend to be.' },
+                        { term: 'Inchoate', definition: 'An offense that is incomplete or only partially in existence, such as "attempted murder" or "conspiracy."' },
+                        { term: 'Mitigate', definition: 'To make less severe. Refers to facts that can lessen a sentence during the punishment phase, but not the charge itself.' },
+                        { term: 'Acquiescence', definition: 'The complete giving over of oneself to another\'s will. Relevant in cases of duress or human trafficking.' },
+                        { term: 'Pecuniary', definition: 'A legal term relating to money or monetary value.' },
+                        { term: 'Circumstantial Evidence', definition: 'Evidence not based on direct observation but on other facts from which a conclusion can be logically drawn.' },
+                        { term: 'Bodily Injury (BI)', definition: 'Pain, illness, or any impairment of physical condition. Even if there are no visible marks, if the person felt pain, it is bodily injury.' },
+                        { term: 'Serious Bodily Injury (SBI)', definition: 'An injury that creates a substantial risk of death, causes death, causes serious permanent disfigurement, or causes protracted loss or impairment of the function of any bodily member or organ.' },
+                        { term: 'Deadly Weapon', definition: 'A firearm or anything designed, made, or adapted for inflicting death or SBI; OR anything that in its manner of use or intended use is capable of causing death or SBI.' },
+                        { term: 'Possession', definition: 'Actual care, custody, control, or management of property. A person can be in possession even if not physically present.' },
+                        { term: 'Public Place', definition: 'Any place where the public or a substantial group of the public has access (streets, common areas of schools, hospitals, apartments, etc.).' },
+                        { term: 'Coercion', definition: 'A threat, however communicated, to commit an offense, inflict BI, accuse someone of an offense, or expose a person to hatred, contempt, or ridicule.' }
+                    ];
+                    
+                    const grid = document.getElementById('flashcard-grid');
+                    const searchResults = document.getElementById('search-results');
+                    
+                    // Render flashcards with improved accessibility
+                    grid.innerHTML = terms.map((t, index) => `
+                        <div class="flashcard-container" data-term="${t.term.toLowerCase()}" role="button" tabindex="0" 
+                             aria-label="Flashcard for ${t.term}. Click to reveal definition.">
+                            <div class="flashcard" data-index="${index}">
+                                <div class="flashcard-face flashcard-front">
+                                    <h3 class="flashcard-term">${t.term}</h3>
+                                </div>
+                                <div class="flashcard-face flashcard-back">
+                                    <p class="flashcard-definition">${t.definition}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Enhanced card interaction with keyboard support
+                    const flipCard = (container) => {
+                        const flashcard = container.querySelector('.flashcard');
+                        const isFlipped = flashcard.classList.contains('is-flipped');
+                        flashcard.classList.toggle('is-flipped');
+                        
+                        // Update aria-label for accessibility
+                        const term = terms[flashcard.dataset.index];
+                        if (isFlipped) {
+                            container.setAttribute('aria-label', `Flashcard for ${term.term}. Click to reveal definition.`);
+                        } else {
+                            container.setAttribute('aria-label', `Flashcard showing definition of ${term.term}. Click to show term.`);
+                        }
+                    };
+
+                    document.querySelectorAll('.flashcard-container').forEach(container => {
+                        // Mouse click
+                        container.addEventListener('click', () => flipCard(container));
+                        
+                        // Keyboard support (Enter and Space)
+                        container.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                flipCard(container);
+                            }
+                        });
+                    });
+
+                    // Enhanced search functionality
+                    const searchInput = document.getElementById('flashcard-search');
+                    const performSearch = () => {
+                        const searchTerm = searchInput.value.toLowerCase().trim();
+                        let visibleCount = 0;
+                        
+                        document.querySelectorAll('.flashcard-container').forEach(card => {
+                            const termText = card.dataset.term;
+                            const termObject = terms.find(t => t.term.toLowerCase() === termText);
+                            const matchesTerm = termText.includes(searchTerm);
+                            const matchesDefinition = termObject && termObject.definition.toLowerCase().includes(searchTerm);
+                            
+                            if (searchTerm === '' || matchesTerm || matchesDefinition) {
+                                card.style.display = 'block';
+                                visibleCount++;
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                        
+                        // Show/hide search results message
+                        if (visibleCount === 0 && searchTerm !== '') {
+                            searchResults.classList.remove('hidden');
+                            searchResults.innerHTML = `<p>No terms found matching "<strong>${searchTerm}</strong>". Try a different search term.</p>`;
+                        } else {
+                            searchResults.classList.add('hidden');
+                        }
+                        
+                        // Update search results count
+                        if (searchTerm !== '' && visibleCount > 0) {
+                            searchResults.classList.remove('hidden');
+                            searchResults.innerHTML = `<p class="text-[var(--accent-color)]">Found ${visibleCount} term${visibleCount !== 1 ? 's' : ''} matching "<strong>${searchTerm}</strong>"</p>`;
+                        }
+                    };
+                    
+                    searchInput.addEventListener('input', performSearch);
+                    searchInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            searchInput.value = '';
+                            performSearch();
+                            searchInput.blur();
+                        }
+                    });
+                }
+            },
+            {
+                id: 'code-overview',
+                title: 'Code Overview & Structure',
+                icon: '🏗️',
+                content: () => `
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-[var(--accent-color)]">Part III: The Texas Penal Code - Overview & Structure</h2>
+                    <p class="mb-8 text-lg text-gray-600 leading-relaxed">This section covers the history, purpose, and structural organization of the Texas Penal Code. Understanding how to navigate the code is a fundamental skill for any peace officer.</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <h3 class="text-2xl font-bold mb-3">Objectives of the Code (Sec 1.02)</h3>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li>Prohibit and penalize harmful conduct.</li>
+                                <li>Ensure public safety through deterrence.</li>
+                                <li>Provide fair warning of illegal conduct and its consequences.</li>
+                                <li>Prescribe proportionate punishments.</li>
+                                <li>Rehabilitate offenders.</li>
+                                <li>Safeguard conduct that is without guilt (e.g., self-defense).</li>
+                                <li>Limit official discretion to prevent arbitrary treatment.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <h3 class="text-2xl font-bold mb-3">How to Read the Code</h3>
+                            <p class="mb-4">The code is organized hierarchically. For example, <strong>22.01(a)(1)</strong> breaks down as:</p>
+                            <ul class="space-y-3">
+                                <li class="flex items-start"><span class="font-bold text-[var(--accent-color)] w-28 flex-shrink-0">Chapter 22:</span><span>Assaultive Offenses</span></li>
+                                <li class="flex items-start"><span class="font-bold text-[var(--accent-color)] w-28 flex-shrink-0">Section .01:</span><span>Assault</span></li>
+                                <li class="flex items-start"><span class="font-bold text-[var(--accent-color)] w-28 flex-shrink-0">Subsection (a):</span><span>The primary definition</span></li>
+                                <li class="flex items-start"><span class="font-bold text-[var(--accent-color)] w-28 flex-shrink-0">Paragraph (1):</span><span>A specific manner of assault</span></li>
+                            </ul>
+                             <p class="mt-4 text-sm text-red-600 font-semibold">Pay close attention to the words "and" / "or" as they are legally critical.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'jurisdiction',
+                title: 'Jurisdiction & Applicability',
+                icon: '🗺️',
+                content: () => `
+                     <h2 class="text-3xl md:text-4xl font-bold mb-4 text-[var(--accent-color)]">Part IV: Jurisdiction & Applicability</h2>
+                     <p class="mb-8 text-lg text-gray-600 leading-relaxed">This section defines when Texas law applies. It covers both territorial limits (where an offense can be prosecuted) and personal limits (like how a person's age is legally calculated).</p>
+                    <div class="space-y-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                           <h3 class="text-2xl font-bold mb-3">Territorial Jurisdiction</h3>
+                           <p class="mb-4">Texas has jurisdiction over a criminal offense if:</p>
+                           <ul class="list-disc list-inside space-y-2 text-gray-700">
+                               <li>The <strong>conduct</strong> or the <strong>result</strong> of the conduct occurred in Texas.</li>
+                               <li>The conduct was an <strong>attempt</strong> outside Texas to commit a crime inside Texas.</li>
+                               <li>The conduct was a <strong>conspiracy</strong> outside Texas to commit a crime inside Texas (and an act was taken in Texas).</li>
+                               <li><strong>Any single element</strong> of the offense was committed in Texas.</li>
+                               <li class="pt-2 font-semibold"><strong>Homicide Rule:</strong> Jurisdiction lies where the physical impact occurred OR where the death occurred. A body found in Texas is presumed to have died in Texas.</li>
+                           </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                           <h3 class="text-2xl font-bold mb-3">Computation of Age</h3>
+                           <p class="text-gray-700 leading-relaxed">A person legally attains a specific age <strong>on the anniversary of their birthdate.</strong> The law does not recognize partial ages (e.g., "16 and a half"). This is critical for offenses where age is a key element, like statutory sexual assault.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'elements',
+                title: 'Elements of an Offense',
+                icon: '🧩',
+                content: () => `
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-[var(--accent-color)]">Part V: The Elements of an Offense & Culpability</h2>
+                    <p class="mb-8 text-lg text-gray-600 leading-relaxed">Every crime is built from specific components called "elements." The prosecution must prove every element beyond a reasonable doubt. Below, we break down these elements and the crucial concept of Culpable Mental States (*Mens Rea*).</p>
+
+                    <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                        <h3 class="text-2xl font-bold mb-4">The Four Elements of an Offense (Corpus Delicti)</h3>
+                        <div class="relative pl-12">
+                            <div class="absolute left-6 h-full border-l-2 border-dashed border-gray-300"></div>
+                            <div class="mb-8 relative">
+                                <div class="absolute -left-16 w-10 h-10 rounded-full bg-[var(--accent-color)] text-white flex items-center justify-center font-bold ring-4 ring-white">1</div>
+                                <strong class="block text-lg">The Forbidden Conduct:</strong> <span class="text-gray-600">The specific act or omission prohibited by the statute.</span>
+                            </div>
+                            <div class="mb-8 relative">
+                                <div class="absolute -left-16 w-10 h-10 rounded-full bg-[var(--accent-color)] text-white flex items-center justify-center font-bold ring-4 ring-white">2</div>
+                                <strong class="block text-lg">The Required Culpability:</strong> <span class="text-gray-600">The mental state (*Mens Rea*) the person had when committing the act.</span>
+                            </div>
+                            <div class="mb-8 relative">
+                                <div class="absolute -left-16 w-10 h-10 rounded-full bg-[var(--accent-color)] text-white flex items-center justify-center font-bold ring-4 ring-white">3</div>
+                                <strong class="block text-lg">The Required Result:</strong> <span class="text-gray-600">The outcome of the conduct (e.g., a death in a murder case).</span>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-16 w-10 h-10 rounded-full bg-gray-400 text-white flex items-center justify-center font-bold ring-4 ring-white">4</div>
+                                <strong class="block text-lg">The Negation of Any Exception:</strong> <span class="text-gray-600">(Only applies if the law has a labeled exception). The prosecution must prove the exception does *not* apply.</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-2xl font-bold mb-4">The Four Culpable Mental States</h3>
+                        <p class="mb-4">This chart visualizes the hierarchy of mental states from most to least severe. An act is only criminal if one of these is present; otherwise, it's a "freak accident."</p>
+                        <div class="chart-container mb-8"><canvas id="culpabilityChart"></canvas></div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="border p-4 rounded-lg bg-red-50 border-red-200"><h4 class="font-bold text-lg text-red-800">1. Intentionally</h4><p>It was the person's <strong>conscious objective or desire</strong> to engage in the conduct or cause the result.</p></div>
+                            <div class="border p-4 rounded-lg bg-orange-50 border-orange-200"><h4 class="font-bold text-lg text-orange-800">2. Knowingly</h4><p>The person was <strong>aware</strong> and <strong>reasonably certain</strong> their conduct would cause the result.</p></div>
+                             <div class="border p-4 rounded-lg bg-yellow-50 border-yellow-300"><h4 class="font-bold text-lg text-yellow-800">3. Recklessly</h4><p>The person is <strong>aware of a risk</strong> but <strong>consciously disregards</strong> it. A gross deviation from the norm.</p></div>
+                            <div class="border p-4 rounded-lg bg-blue-50 border-blue-200"><h4 class="font-bold text-lg text-blue-800">4. Criminal Negligence</h4><p>The person <strong>ought to have been aware</strong> of a risk but failed to perceive it. A gross deviation from the norm.</p></div>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('culpabilityChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Intentionally', 'Knowingly', 'Recklessly', 'Criminal Negligence'],
+                            datasets: [{
+                                label: 'Severity Level', data: [4, 3, 2, 1],
+                                backgroundColor: ['rgba(220, 38, 38, 0.7)', 'rgba(249, 115, 22, 0.7)', 'rgba(234, 179, 8, 0.7)', 'rgba(59, 130, 246, 0.7)'],
+                                borderColor: ['rgb(220, 38, 38)', 'rgb(249, 115, 22)', 'rgb(234, 179, 8)', 'rgb(59, 130, 246)'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                title: { display: true, text: 'Hierarchy of Culpable Mental States (Most to Least Severe)', font: { size: 16 } },
+                                tooltip: {
+                                    backgroundColor: '#3D3D3D', titleFont: { size: 14 }, bodyFont: { size: 12 },
+                                    callbacks: { label: (context) => `Severity: ${context.raw}` }
+                                }
+                            },
+                            scales: { x: { beginAtZero: true, ticks: { display: false } }, y: { ticks: { font: { size: 14 } } } }
+                        }
+                    });
+                }
+            },
+             {
+                id: 'defenses',
+                title: 'Defenses & Burden of Proof',
+                icon: '🛡️',
+                content: () => `
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-[var(--accent-color)]">Part VI: Defenses, Exceptions, and Burden of Proof</h2>
+                    <p class="mb-8 text-lg text-gray-600 leading-relaxed">The legal system provides ways for a defendant to justify their actions. This section compares the three types of exemptions and clarifies the crucial differences in who must prove them (the burden of proof).</p>
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500 flex flex-col">
+                            <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="text-3xl mr-3">❗️</span>Exception</h3>
+                            <div class="space-y-4 flex-grow">
+                                <p><strong class="block text-gray-500">Labeled As:</strong> "It is an exception to the application..."</p>
+                                <p><strong class="block text-gray-500">Who Acts?</strong> The <span class="font-semibold text-red-600">Prosecution</span> must negate (disprove) the exception's existence.</p>
+                                <p><strong class="block text-gray-500">Standard:</strong> Prosecution's burden is <span class="font-semibold">Beyond a Reasonable Doubt.</span></p>
+                            </div>
+                            <p class="mt-4 pt-4 border-t text-sm text-gray-800 font-medium"><strong>Result:</strong> If the exception applies, the offense legally doesn't exist. No arrest can be made.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-yellow-500 flex flex-col">
+                            <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="text-3xl mr-3">🤔</span>Defense</h3>
+                            <div class="space-y-4 flex-grow">
+                                <p><strong class="block text-gray-500">Labeled As:</strong> "It is a defense to prosecution..."</p>
+                                <p><strong class="block text-gray-500">Who Acts?</strong> The <span class="font-semibold text-yellow-600">Defense</span> must first introduce evidence to raise the defense.</p>
+                                <p><strong class="block text-gray-500">Standard:</strong> If raised, the <span class="font-semibold">Prosecution</span> must disprove it <span class="font-semibold">Beyond a Reasonable Doubt.</span></p>
+                            </div>
+                            <p class="mt-4 pt-4 border-t text-sm text-gray-800 font-medium"><strong>Result:</strong> High burden for the prosecution to overcome once raised.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500 flex flex-col">
+                            <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="text-3xl mr-3">✅</span>Affirmative Defense</h3>
+                            <div class="space-y-4 flex-grow">
+                                <p><strong class="block text-gray-500">Labeled As:</strong> "It is an affirmative defense..."</p>
+                                <p><strong class="block text-gray-500">Who Acts?</strong> The <span class="font-semibold text-green-600">Defense</span> must introduce evidence and prove the defense.</p>
+                                <p><strong class="block text-gray-500">Standard:</strong> Defense's burden is <span class="font-semibold">Preponderance of the Evidence.</span></p>
+                            </div>
+                            <p class="mt-4 pt-4 border-t text-sm text-gray-800 font-medium"><strong>Result:</strong> The burden of proof is on the defendant, but it's a lower, easier standard to meet.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'prosecutions',
+                title: 'Multiple Prosecutions',
+                icon: '⚖️',
+                 content: () => `
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-[var(--accent-color)]">Part VII: Multiple Prosecutions & Criminal Episodes</h2>
+                    <p class="mb-8 text-lg text-gray-600 leading-relaxed">This section explains how the law handles situations where a person commits multiple offenses as part of the same course of conduct, known as a criminal episode.</p>
+                     <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-2xl font-bold mb-3">Criminal Episode</h3>
+                        <p class="mb-4">A criminal episode is the commission of <strong>two or more offenses</strong> if they were committed pursuant to:</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700 mb-4">
+                            <li>The same transaction, OR</li>
+                            <li>A common scheme or plan.</li>
+                        </ul>
+                        <p class="mb-4"><strong>Example:</strong> A person breaks out 36 car windows in one night across town. This is a single criminal episode involving multiple offenses.</p>
+                        <h3 class="text-xl font-bold mb-3">Joinder, Sentencing, and Severance</h3>
+                        <ul class="space-y-3 text-gray-700">
+                           <li><strong>Consolidation (Joinder):</strong> A defendant can be prosecuted in a <strong>single trial</strong> for all offenses in the same criminal episode.</li>
+                           <li><strong>Sentencing:</strong> When offenses are joined, sentences <strong>must run concurrently</strong> (at the same time), not consecutively (one after the other).</li>
+                           <li><strong>Right to Severance:</strong> The defendant has the right to ask the court to "sever" the offenses into separate trials, which the court has discretion to grant.</li>
+                        </ul>
+                     </div>
+                `
+            }
+        ],
+
+        init() {
+            this.renderNav();
+            this.router();
+            window.addEventListener('hashchange', () => this.router());
+            this.setupMobileMenu();
+        },
+
+        router() {
+            const hash = window.location.hash.substring(1) || this.sections[0].id;
+            const section = this.sections.find(s => s.id === hash);
+            const mainContent = document.getElementById('main-content');
+            
+            if (section) {
+                mainContent.innerHTML = section.content();
+                mainContent.scrollTop = 0;
+                if (section.onLoad) {
+                    section.onLoad();
+                }
+                this.updateActiveLink(hash);
+            } else {
+                mainContent.innerHTML = `<h2 class="text-2xl font-bold">404 - Section Not Found</h2>`;
+            }
+        },
+
+        renderNav() {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.innerHTML = this.sections.map(s => `
+                <a href="#${s.id}" class="nav-link flex items-center space-x-3 p-3 rounded-md text-gray-700" data-navid="${s.id}">
+                    <span class="text-xl">${s.icon}</span>
+                    <span class="font-medium">${s.title}</span>
+                </a>
+            `).join('');
+        },
+
+        updateActiveLink(activeId) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('active', link.dataset.navid === activeId);
+            });
+        },
+        
+        setupMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const overlay = document.getElementById('mobile-overlay');
+
+            const openMenu = () => {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            };
+
+            const closeMenu = () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            };
+
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    openMenu();
+                } else {
+                    closeMenu();
+                }
+            });
+            
+            overlay.addEventListener('click', closeMenu);
+            sidebar.addEventListener('click', (e) => {
+                if (e.target.closest('a')) {
+                    closeMenu();
+                }
+            });
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => AppData.init());
+</script>
+</body>
+</html>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="inline-block w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        Apply penal code knowledge to real-world scenarios
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Key Topics -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="content-card bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Code Structure</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>• Title, Chapter, and Section organization</li>
+                        <li>• How to read legal citations</li>
+                        <li>• Cross-referencing techniques</li>
+                        <li>• Updates and amendments</li>
+                    </ul>
+                </div>
+                
+                <div class="content-card bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Essential Definitions</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>• Act vs. Omission</li>
+                        <li>• Culpable mental states</li>
+                        <li>• Elements of an offense</li>
+                        <li>• Defenses and justifications</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Interactive Study Guide -->
+            <div class="content-card bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 shadow-lg mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Interactive Study Guide</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <a href="index.html#terminology" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition">
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">📚</div>
+                            <h4 class="font-semibold text-gray-800">Legal Terminology</h4>
+                            <p class="text-sm text-gray-600 mt-1">Interactive flashcards</p>
+                        </div>
+                    </a>
+                    <div class="block p-4 bg-white rounded-lg shadow">
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">📖</div>
+                            <h4 class="font-semibold text-gray-800">Case Studies</h4>
+                            <p class="text-sm text-gray-600 mt-1">Coming soon</p>
+                        </div>
+                    </div>
+                    <div class="block p-4 bg-white rounded-lg shadow">
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">✅</div>
+                            <h4 class="font-semibold text-gray-800">Practice Quiz</h4>
+                            <p class="text-sm text-gray-600 mt-1">Coming soon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Notes -->
+            <div class="content-card bg-amber-50 border-l-4 border-amber-400 rounded-xl p-6 shadow-lg">
+                <h3 class="text-lg font-semibold text-amber-800 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    Important Notes
+                </h3>
+                <ul class="space-y-2 text-amber-700">
+                    <li>• Always reference the most current version of the Penal Code</li>
+                    <li>• Elements of an offense must ALL be present for a valid charge</li>
+                    <li>• Mental state (mens rea) is crucial in determining the level of offense</li>
+                    <li>• Understanding exceptions and defenses is as important as knowing the offense</li>
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Navigation Footer -->
+    <footer class="bg-white border-t shadow-sm">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex justify-between items-center">
+                <a href="denton-pd-academy.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                    ← Back to Week Overview
+                </a>
+                <div class="text-sm text-gray-500">
+                    Next: Radio Communications
+                </div>
+                <a href="week1-radio-communications.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                    Next Topic →
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
